@@ -181,6 +181,7 @@ jobs:
           cd tests/Auto-GPT-test-cassettes
           git config --global user.name "Auto-GPT-Bot"
           git config --global user.email "github-bot@agpt.co"
+          git fetch origin $cassette_source_branch
 
           # Commit & push changes to cassettes if any
           if ! git diff --quiet; then
@@ -189,15 +190,18 @@ jobs:
             fi
             git add .
             git commit -m "Auto-update cassettes"
-            git pull --rebase origin $cassette_source_branch
 
-            git push origin HEAD:$cassette_branch
 
-            cd ../..
             if [ $is_pull_request ]; then
+              git push origin HEAD:$cassette_branch
+                          cd ../..
+
               git fetch origin $base_branch
               cassette_diff=$(git diff $cassette_branch origin/$base_branch)
             else
+              git push origin HEAD:$cassette_branch
+              cd ../..
+
               git add tests/Auto-GPT-test-cassettes
               git commit -m "Update cassette submodule"
               git push origin HEAD:$current_branch
