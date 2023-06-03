@@ -181,7 +181,6 @@ jobs:
           cd tests/Auto-GPT-test-cassettes
           git config --global user.name "Auto-GPT-Bot"
           git config --global user.email "github-bot@agpt.co"
-          git fetch origin $cassette_source_branch
 
           # Commit & push changes to cassettes if any
           if ! git diff --quiet; then
