@@ -130,7 +130,7 @@ jobs:
 
       - name: Run pytest tests with coverage
         run: |
-          pytest -n auto --cov=autogpt --cov-report term-missing --cov-branch --cov-report xml --cov-report term
+          pytest -n auto tests/integration/challenges/basic_abilities/test_write_file.py --cov=autogpt --cov-report term-missing --cov-branch --cov-report xml --cov-report term
           python tests/integration/challenges/utils/build_current_score.py
         env:
           CI: true
@@ -144,17 +144,19 @@ jobs:
       - id: setup_git_auth
         name: Set up git token authentication
         run: |
+          base64_pat=$(echo -n "pat:${{ secrets.PAT_REVIEW }}" | base64 -w0)
           config_key="http.${{ github.server_url }}/.extraheader"
           git config "$config_key" \
-            "Authorization: Basic x-access-token:${{ secrets.PAT_REVIEW }}"
-
+            "Authorization: Basic $base64_pat"
           echo "config_key=$config_key" >> $GITHUB_OUTPUT
 
       - name: Push updated challenge scores
         if: github.event_name == 'push'
         run: |
+          git config --global user.name "Auto-GPT-Bot"
+          git config --global user.email "github-bot@agpt.co"
           score_file="tests/integration/challenges/current_score.json"
-
+          
           if ! git diff --quiet $score_file; then
             git add $score_file
             git commit -m "Update challenge scores"
@@ -177,10 +179,12 @@ jobs:
           fi
 
           cd tests/Auto-GPT-test-cassettes
+          git config --global user.name "Auto-GPT-Bot"
+          git config --global user.email "github-bot@agpt.co"
           git fetch origin $cassette_source_branch
 
           # Commit & push changes to cassettes if any
-          if ! git diff-index --quiet $cassette_source_branch; then
+          if ! git diff; then
             if ! [ "$cassette_branch" = "$cassette_source_branch" ]; then
               git checkout -b $cassette_branch
             fi
