@@ -184,7 +184,7 @@ jobs:
           git fetch origin $cassette_source_branch
 
           # Commit & push changes to cassettes if any
-          if ! git diff; then
+          if ! git diff --quiet; then
             if ! [ "$cassette_branch" = "$cassette_source_branch" ]; then
               git checkout -b $cassette_branch
             fi
