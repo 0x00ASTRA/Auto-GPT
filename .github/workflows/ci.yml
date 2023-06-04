@@ -199,6 +199,10 @@ jobs:
               git fetch origin $base_branch
               cassette_diff=$(git diff $cassette_branch origin/$base_branch)
             else
+              base64_pat=$(echo -n "pat:${{ secrets.PAT_REVIEW }}" | base64 -w0)
+              config_key="http.${{ github.server_url }}/.extraheader"
+              git config "$config_key" \
+                "Authorization: Basic $base64_pat"
               git push origin HEAD:$cassette_branch
               cd ../..
 
