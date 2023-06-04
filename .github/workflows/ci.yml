@@ -193,8 +193,9 @@ jobs:
 
 
             if [ $is_pull_request ]; then
+              git pull --rebase origin
               git push origin HEAD:$cassette_branch
-                          cd ../..
+              cd ../..
 
               git fetch origin $base_branch
               cassette_diff=$(git diff $cassette_branch origin/$base_branch)
